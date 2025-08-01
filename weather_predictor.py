@@ -1,3 +1,5 @@
+"This code was originally created in Google Colab every space is a new block (this code is intended to run in Colab)"
+
 import pandas as pd
 
 weather = pd.read_csv("4086950.csv", index_col="DATE")
