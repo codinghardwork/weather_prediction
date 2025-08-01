@@ -4,23 +4,15 @@ import pandas as pd
 
 weather = pd.read_csv("4086950.csv", index_col="DATE")
 
-weather
-
 null_pct = weather.apply(pd.isnull).sum()/weather.shape[0]
 
 weather.apply(pd.isnull).sum()
 
-null_pct
-
 valid_columns = weather.columns[null_pct < .05]
-
-valid_columns
 
 weather = weather[valid_columns].copy()
 
 weather.columns = weather.columns.str.lower()
-
-weather
 
 weather = weather.ffill()
 
@@ -40,23 +32,15 @@ weather.index.year.value_counts().sort_index()
 
 weather["snwd"].plot()
 
-weather
-
 weather["target"] = weather.shift(-1)["tmax"]
 
-weather
-
 weather = weather.ffill()
-
-weather
 
 from sklearn.linear_model import Ridge
 
 rr = Ridge(alpha=.1)
 
 predictors = weather.columns[~weather.columns.isin(["target", "name", "station"])]
-
-predictors
 
 def backtest(weather, model, predictors, start=3650, step=90):
   all_predictions = []
@@ -81,8 +65,6 @@ def backtest(weather, model, predictors, start=3650, step=90):
 
 predictions = backtest(weather, rr, predictors)
 
-predictions
-
 from sklearn.metrics import mean_absolute_error
 
 mean_absolute_error(predictions["actual"], predictions["prediction"])
@@ -104,15 +86,9 @@ for horizon in rolling_horizons:
   for col in ["tmax", "tmin", "prcp"]:
     weather = compute_rolling(weather, horizon, col)
 
-weather
-
 weather = weather.iloc[14:,:]
 
-weather
-
 weather = weather.fillna(0)
-
-weather
 
 def expand_mean(df):
   return df.expanding(1).mean()
@@ -121,11 +97,7 @@ for col in ["tmax", "tmin", "prcp"]:
   weather [f"month_avg_{col}"] = weather[col].groupby(weather.index.month, group_keys=False).apply(expand_mean)
   weather[f"day_avg_{col}"] = weather[col].groupby(weather.index.day_of_year, group_keys=False).apply(expand_mean)
 
-weather
-
 predictors = weather.columns[~weather.columns.isin(["target", "name", "station"])]
-
-predictors
 
 predictions = backtest(weather, rr, predictors)
 
